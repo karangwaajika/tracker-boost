@@ -55,8 +55,6 @@ public class ApplicationSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login",
                                 "api/projects/**","api/tasks/**" ).permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
-                                "/swagger-ui/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/me").hasRole("CONTRACTOR")
                         .requestMatchers("/api/admin/users").hasRole("ADMIN")
                         .requestMatchers("/api/users/view").hasRole("ADMIN")
@@ -87,6 +85,8 @@ public class ApplicationSecurityConfig {
     public SecurityFilterChain webChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
+                                "/swagger-ui/**").permitAll()
                         .requestMatchers(
                                 "/css/**", "/js/**","/webjars/**", "/images/**",
                                 "/login", "/oauth2/**", "/actuator/**").permitAll()
