@@ -7,6 +7,7 @@ import com.lab.trackerboost.exception.ProjectExistsException;
 import com.lab.trackerboost.exception.ProjectNotFoundException;
 import com.lab.trackerboost.model.ProjectEntity;
 import com.lab.trackerboost.repository.ProjectRepository;
+import com.lab.trackerboost.service.AuditLogService;
 import com.lab.trackerboost.service.ProjectService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,13 +28,16 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectRepository projectRepository;
     ModelMapper modelMapper;
     TaskMetrics taskMetrics;
+    AuditLogService auditLogService;
 
     public ProjectServiceImpl(ProjectRepository projectRepository,
-                              ModelMapper modelMapper, TaskMetrics taskMetrics){
+                              ModelMapper modelMapper, TaskMetrics taskMetrics,
+                              AuditLogService auditLogService){
 
         this.projectRepository = projectRepository;
         this.modelMapper = modelMapper;
         this.taskMetrics = taskMetrics;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -47,6 +52,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         ProjectEntity project = this.modelMapper
                                     .map(projectRepository, ProjectEntity.class);
+        // insert log action for create project
+        this.auditLogService.logAction(
+                "CREATE", "Project", project.getId().toString(), "user",
+                Map.of("name", project.getName(), "description", project.getDescription())
+        );
+
         return this.modelMapper
                 .map(this.projectRepository.save(project), ProjectResponseDto.class);
     }
@@ -93,6 +104,13 @@ public class ProjectServiceImpl implements ProjectService {
             project.setStatus(projectDto.getStatus());
         }
 
+        // insert log action for update project
+        this.auditLogService.logAction(
+                "UPDATE", "Project", project.getId().toString(), "user",
+                Map.of("name", project.getName(), "description", project.getDescription())
+        );
+
+
         return this.modelMapper
                 .map(this.projectRepository.save(project), ProjectResponseDto.class);
     }
@@ -107,6 +125,12 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow( () -> new ProjectNotFoundException(
                         String.format("A project with the Id '%d' doesn't exist", id))
                 );
+
+        // insert log action for delete project
+        this.auditLogService.logAction(
+                "DELETE", "Project", project.getId().toString(), "user",
+                Map.of("name", project.getName(), "description", project.getDescription())
+        );
 
         this.projectRepository.deleteById(id);
     }
