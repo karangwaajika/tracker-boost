@@ -53,7 +53,8 @@ public class ApplicationSecurityConfig {
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login",
+                                "api/projects/**","api/tasks/**" ).permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
                                 "/swagger-ui/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/me").hasRole("CONTRACTOR")
