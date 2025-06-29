@@ -89,7 +89,7 @@ public class ApplicationSecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/css/**", "/js/**","/webjars/**", "/images/**",
-                                "/login", "/oauth2/**").permitAll()
+                                "/login", "/oauth2/**", "/actuator/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form.loginPage("/login"))       // optional classic login
                 .oauth2Login(oauth2 -> oauth2

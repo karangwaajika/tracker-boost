@@ -6,6 +6,10 @@ import com.lab.trackerboost.model.ProjectEntity;
 import com.lab.trackerboost.repository.ProjectRepository;
 import com.lab.trackerboost.service.ProjectService;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable("authorsPageable")
     public Page<ProjectResponseDto> findAll(Pageable pageable) {
         Page<ProjectEntity> projectEntityList = this.projectRepository.findAll(pageable);
         return projectEntityList
@@ -48,6 +53,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "authorsPageable", allEntries = true), // to update the entire list
+            put = @CachePut(value = "author", key = "#result.id") // Different cache name for individual authors
+    )
     public ProjectResponseDto partialUpdate(ProjectRequestDto projectDto, Long id) {
         ProjectEntity project = findProjectById(id)
                 .orElseThrow();
@@ -71,6 +80,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "authorsPageable", key = "#id")
     public void deleteById(Long id) {
         ProjectEntity project = findProjectById(id).orElseThrow();
 
@@ -78,6 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable("authors")
     public List<ProjectResponseDto> findAllProject() {
         List<ProjectEntity> projectEntityList = this.projectRepository.findAll();
         return projectEntityList.stream()
@@ -87,6 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable("authorsWithoutTasks")
     public List<ProjectResponseDto> findProjectsWithoutTasks() {
         List<ProjectEntity> projectEntityList = this.projectRepository.findProjectsWithoutTasks();
         return projectEntityList
