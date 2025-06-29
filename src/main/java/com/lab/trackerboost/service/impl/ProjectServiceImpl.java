@@ -3,8 +3,11 @@ package com.lab.trackerboost.service.impl;
 import com.lab.trackerboost.config.TaskMetrics;
 import com.lab.trackerboost.dto.project.ProjectRequestDto;
 import com.lab.trackerboost.dto.project.ProjectResponseDto;
+import com.lab.trackerboost.exception.ProjectExistsException;
+import com.lab.trackerboost.exception.ProjectNotFoundException;
 import com.lab.trackerboost.model.ProjectEntity;
 import com.lab.trackerboost.repository.ProjectRepository;
+import com.lab.trackerboost.service.AuditLogService;
 import com.lab.trackerboost.service.ProjectService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -24,21 +28,36 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectRepository projectRepository;
     ModelMapper modelMapper;
     TaskMetrics taskMetrics;
+    AuditLogService auditLogService;
 
     public ProjectServiceImpl(ProjectRepository projectRepository,
-                              ModelMapper modelMapper, TaskMetrics taskMetrics){
+                              ModelMapper modelMapper, TaskMetrics taskMetrics,
+                              AuditLogService auditLogService){
 
         this.projectRepository = projectRepository;
         this.modelMapper = modelMapper;
         this.taskMetrics = taskMetrics;
+        this.auditLogService = auditLogService;
     }
 
     @Override
     public ProjectResponseDto create(ProjectRequestDto dto) {
         this.taskMetrics.incrementTasksProcessed(); // increment task processed
 
+        if(findProjectByName(dto.getName()).isPresent()){
+            throw new ProjectExistsException(
+                    String.format("A project with the name '%s' already exist",
+                            dto.getName()));
+        }
+
         ProjectEntity project = this.modelMapper
                                     .map(projectRepository, ProjectEntity.class);
+        // insert log action for create project
+        this.auditLogService.logAction(
+                "CREATE", "Project", project.getId().toString(), "user",
+                Map.of("name", project.getName(), "description", project.getDescription())
+        );
+
         return this.modelMapper
                 .map(this.projectRepository.save(project), ProjectResponseDto.class);
     }
@@ -68,7 +87,9 @@ public class ProjectServiceImpl implements ProjectService {
         this.taskMetrics.incrementTasksProcessed(); // increment task processed
 
         ProjectEntity project = findProjectById(id)
-                .orElseThrow();
+                .orElseThrow( () -> new ProjectNotFoundException(
+                        String.format("A project with the Id '%d' doesn't exist", id))
+                );
         // update only fields that are provided
         if(projectDto.getName() != null){
             project.setName(projectDto.getName());
@@ -83,6 +104,13 @@ public class ProjectServiceImpl implements ProjectService {
             project.setStatus(projectDto.getStatus());
         }
 
+        // insert log action for update project
+        this.auditLogService.logAction(
+                "UPDATE", "Project", project.getId().toString(), "user",
+                Map.of("name", project.getName(), "description", project.getDescription())
+        );
+
+
         return this.modelMapper
                 .map(this.projectRepository.save(project), ProjectResponseDto.class);
     }
@@ -93,7 +121,16 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteById(Long id) {
         this.taskMetrics.incrementTasksProcessed(); // increment task processed
 
-        ProjectEntity project = findProjectById(id).orElseThrow();
+        ProjectEntity project = findProjectById(id)
+                .orElseThrow( () -> new ProjectNotFoundException(
+                        String.format("A project with the Id '%d' doesn't exist", id))
+                );
+
+        // insert log action for delete project
+        this.auditLogService.logAction(
+                "DELETE", "Project", project.getId().toString(), "user",
+                Map.of("name", project.getName(), "description", project.getDescription())
+        );
 
         this.projectRepository.deleteById(id);
     }
