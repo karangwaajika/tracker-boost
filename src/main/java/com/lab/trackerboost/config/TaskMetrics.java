@@ -2,7 +2,9 @@ package com.lab.trackerboost.config;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TaskMetrics {
     private final Counter tasksProcessed;
 
