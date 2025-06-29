@@ -1,5 +1,6 @@
 package com.lab.trackerboost.service.impl;
 
+import com.lab.trackerboost.config.TaskMetrics;
 import com.lab.trackerboost.dto.task.TaskDto;
 import com.lab.trackerboost.dto.task.TaskResponseDto;
 import com.lab.trackerboost.exception.DeveloperNotFoundException;
@@ -30,18 +31,23 @@ public class TaskServiceImpl implements TaskService {
     TaskRepository taskRepository;
     ProjectService projectService;
     DeveloperService developerService;
+    TaskMetrics taskMetrics;
 
     public TaskServiceImpl(TaskRepository taskRepository,
                            ProjectService projectService,
-                           DeveloperService developerService) {
+                           DeveloperService developerService,
+                           TaskMetrics taskMetrics) {
 
         this.taskRepository = taskRepository;
         this.projectService = projectService;
         this.developerService = developerService;
+        this.taskMetrics = taskMetrics;
     }
 
     @Override
     public TaskEntity create(TaskDto taskDto) {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         Optional<ProjectEntity> project = this.projectService.findProjectById(taskDto.getProjectId());
         if(project.isEmpty()){
             throw new ProjectNotFoundException(
@@ -66,11 +72,14 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Optional<TaskEntity> findTaskByTitle(String title) {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
         return this.taskRepository.findTaskEntitiesByTitle(title);
     }
 
     @Override
     public Page<TaskResponseDto> findAll(Pageable pageable) {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         Page<TaskEntity> taskEntityPage = this.taskRepository.findAll(pageable);
 
         return taskEntityPage.map(TaskMapper::toResponseDto);
@@ -78,6 +87,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskEntity partialUpdate(TaskDto taskDto, Long taskId, Authentication auth) throws AccessDeniedException {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
         TaskEntity taskEntity = findTaskById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(
                         String.format("A task with the Id '%d' doesn't exist", taskId)));
@@ -114,6 +124,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteById(Long id) {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         if(findTaskById(id).isEmpty()){
             throw new TaskNotFoundException(
                     String.format("A task with the Id '%d' doesn't exist", id));
@@ -123,6 +135,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void assignTaskToDeveloper(Long taskId, Long developerId) {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         TaskEntity task = this.taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(
                         String.format("A task with the Id '%d' doesn't exist", taskId)
@@ -138,23 +152,30 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> findAllByOrderByDueDateAsc() {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         List<TaskEntity> tasks = taskRepository.findAllByOrderByDueDateAsc();
         return tasks.stream().map(TaskMapper::toResponseDto).toList();
     }
 
     @Override
     public List<TaskResponseDto> findOverdueTasks() {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         List<TaskEntity> tasks = this.taskRepository.findOverdueTasks();
         return tasks.stream().map(TaskMapper::toResponseDto).toList();
     }
 
     @Override
     public List<DeveloperTaskCount> findTopDevelopers(Pageable pageable) {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
+
         return this.taskRepository.findTopDevelopers(pageable);
     }
 
     @Override
     public List<TaskStatusCount> countTasksByStatus() {
+        this.taskMetrics.incrementTasksProcessed(); // increment task processed
         return this.taskRepository.countTasksByStatus();
     }
 
