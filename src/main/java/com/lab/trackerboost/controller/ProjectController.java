@@ -1,6 +1,7 @@
 package com.lab.trackerboost.controller;
 
 import com.lab.trackerboost.dto.project.ProjectRequestDto;
+import com.lab.trackerboost.dto.project.ProjectResponseDto;
 import com.lab.trackerboost.model.ProjectEntity;
 import com.lab.trackerboost.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +31,8 @@ public class ProjectController {
     @Operation(summary = "Create project",
             description = "This request inserts a project to the database and returns " +
                           "the inserted project ")
-    public ResponseEntity<ProjectEntity> addProject(@RequestBody ProjectRequestDto project){
-        ProjectEntity savedProject = this.projectService.create(project);
+    public ResponseEntity<ProjectResponseDto> addProject(@RequestBody ProjectRequestDto project){
+        ProjectResponseDto savedProject = this.projectService.create(project);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProject);
     }
 
@@ -48,7 +49,7 @@ public class ProjectController {
     @Operation(summary = "View Projects",
             description = "This method applies pagination for efficient retrieval " +
                           "of projects list")
-    public Page<ProjectEntity> viewProjects(Pageable pageable){
+    public Page<ProjectResponseDto> viewProjects(Pageable pageable){
         return this.projectService.findAll(pageable);
     }
 
@@ -57,11 +58,10 @@ public class ProjectController {
             description = "The project can be updated partially, " +
                           "it's doesn't necessary required " +
                           "all the fields to be updated")
-    public ResponseEntity<ProjectEntity> updateProject(@RequestBody ProjectEntity project,
+    public ResponseEntity<ProjectResponseDto> updateProject(@RequestBody ProjectRequestDto project,
                                                             @PathVariable Long id){
 
-        ProjectEntity updatedProject = this.projectService.partialUpdate(project, id);
-
+        ProjectResponseDto updatedProject = this.projectService.partialUpdate(project, id);
         return ResponseEntity.status(HttpStatus.OK).body(updatedProject);
     }
 
@@ -80,8 +80,8 @@ public class ProjectController {
     @Operation(summary = "View Projects",
             description = "This method applies pagination for efficient retrieval " +
                           "of projects list")
-    public ResponseEntity<List<ProjectEntity>> viewAllProjects(){
-        List<ProjectEntity> projects = this.projectService.findAllProject();
+    public ResponseEntity<List<ProjectResponseDto>> viewAllProjects(){
+        List<ProjectResponseDto> projects = this.projectService.findAllProject();
         return ResponseEntity.status(HttpStatus.OK).body(projects);
     }
 
@@ -89,7 +89,7 @@ public class ProjectController {
     @Operation(summary = "View Projects",
             description = "This method applies pagination for efficient retrieval " +
                           "of projects list")
-    public List<ProjectEntity> viewProjectsWithNoTask(Pageable pageable){
+    public List<ProjectResponseDto> viewProjectsWithNoTask(Pageable pageable){
         return this.projectService.findProjectsWithoutTasks();
     }
 
