@@ -12,14 +12,21 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
 
 ## 🎥 Video
 * Final Project: Not Available for now!
----
+  
 ## 🧩 Diagram
-* Component diagram: <a href="https://drive.google.com/file/d/1_ltTqN6KSubbTDNp-c-W7sVSpbAdLDPH/view?usp=sharing">Available here</a>
-  <img src="image/componentDiagram.png" alt="drawing" style="height:250px; width: 1000px"/>
 
-* ERD: <a href="https://drive.google.com/file/d/1yx91iDzRJZj91rGV1AZgFM__RQeRkDOn/view?usp=sharing">Available here</a>
-  <img src="image/erdlab2.png" alt="drawing" style="height:280px; width: 1000px"/>
----
+<div style="display: flex; gap: 20px;">
+  <div style="flex: 1;">
+    <p>Component diagram: <a href="https://drive.google.com/file/d/1_ltTqN6KSubbTDNp-c-W7sVSpbAdLDPH/view?usp=sharing">Available here</a></p>
+    <img src="image/componentDiagram.png" alt="Component Diagram" style="height: 250px; width: 100%; object-fit: cover;">
+  </div>
+  <div style="flex: 1;">
+    <p>ERD: <a href="https://drive.google.com/file/d/1yx91iDzRJZj91rGV1AZgFM__RQeRkDOn/view?usp=sharing">Available here</a></p>
+    <img src="image/erdlab2.png" alt="ERD" style="height: 250px; width: 100%; object-fit: cover;">
+  </div>
+</div>
+
+  
 ## 🛠 Usage
 * Backend codes: Logic behind (MVC Architecture)
     - controller handle http request and response
@@ -34,7 +41,7 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
     - Service → Repository: Queries or updates data
     - Repository → Database: Executes SQL queries
     - Client ↔ Postman: View and test API endpoints
----
+
 ## ⚙ **How to Run**
 
 1. Clone the repository:
@@ -48,9 +55,8 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
    ```bash
    ./mvnw spring-boot:run  
 4. Access the following:
-     - Actuator metrics: http://localhost:8080/actuator/metrics
-     - Grafana dashboard: http://localhost:3000
----
+     - Actuator metrics: `http://localhost:8080/actuator/metrics`
+     - Grafana dashboard: `http://localhost:3000`
 
 ## 🧪 Profiling & Testing
 
@@ -58,15 +64,13 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
 - Use **JProfiler** to capture heap dumps and monitor memory usage
 - Review logs and metrics in real-time via **Actuator** and **Grafana**
 
----
 ## 📸 Screenshots JMeter and Grafana
 
 <div style="display: flex; gap: 10px;">
-  <img src="image/labjmeter.png" alt="Screenshot 1" width="45%" />
-  <img src="image/lab-grafana.png" alt="Screenshot 2" width="45%" />
+  <img src="image/labjmeter.png" alt="Screenshot 1" style="height: 200px; width: 45%;"/>
+  <img src="image/lab-grafana.png" alt="Screenshot 2" style="height: 200px; width: 45%;"/>
 </div>
 
----
 ## 📌 Key Improvements
 
 - Better **memory management** and lower GC pause times
@@ -74,7 +78,6 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
 - Caching frequently accessed data with **Redis**
 - Observability via **Spring Boot Actuator**, **Prometheus**, and **Grafana**
 
----
 ## 🧩 Project Structure
 
 - `src/main/java` – Core application code (services, controllers, DTOs)
@@ -82,7 +85,6 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
 - `docker-compose.yml` – Docker services (Redis, PostgreSQL, MongoDB, Prometheus, Grafana)
 - `README.md` – Project documentation
 
----
 ## 📊 **Tools & Technologies**
 
 - Java & Spring Boot
@@ -94,7 +96,6 @@ The goal is to identify and fix performance bottlenecks, improve resource usage,
 - PostgreSQL / MongoDB (data stores)
 - Docker (for local development & orchestration)
 
----
 ## Swagger / OpenAPI end points.
 *  /api/auth/**               →  “auth”       (login and registration)
 *  /auth/oauth2/**            →  “auth”       (OAuth2 callback & success)
