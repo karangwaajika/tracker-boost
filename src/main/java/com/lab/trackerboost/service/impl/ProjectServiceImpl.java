@@ -3,6 +3,8 @@ package com.lab.trackerboost.service.impl;
 import com.lab.trackerboost.config.TaskMetrics;
 import com.lab.trackerboost.dto.project.ProjectRequestDto;
 import com.lab.trackerboost.dto.project.ProjectResponseDto;
+import com.lab.trackerboost.exception.ProjectExistsException;
+import com.lab.trackerboost.exception.ProjectNotFoundException;
 import com.lab.trackerboost.model.ProjectEntity;
 import com.lab.trackerboost.repository.ProjectRepository;
 import com.lab.trackerboost.service.ProjectService;
@@ -37,6 +39,12 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectResponseDto create(ProjectRequestDto dto) {
         this.taskMetrics.incrementTasksProcessed(); // increment task processed
 
+        if(findProjectByName(dto.getName()).isPresent()){
+            throw new ProjectExistsException(
+                    String.format("A project with the name '%s' already exist",
+                            dto.getName()));
+        }
+
         ProjectEntity project = this.modelMapper
                                     .map(projectRepository, ProjectEntity.class);
         return this.modelMapper
@@ -68,7 +76,9 @@ public class ProjectServiceImpl implements ProjectService {
         this.taskMetrics.incrementTasksProcessed(); // increment task processed
 
         ProjectEntity project = findProjectById(id)
-                .orElseThrow();
+                .orElseThrow( () -> new ProjectNotFoundException(
+                        String.format("A project with the Id '%d' doesn't exist", id))
+                );
         // update only fields that are provided
         if(projectDto.getName() != null){
             project.setName(projectDto.getName());
@@ -93,7 +103,10 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteById(Long id) {
         this.taskMetrics.incrementTasksProcessed(); // increment task processed
 
-        ProjectEntity project = findProjectById(id).orElseThrow();
+        ProjectEntity project = findProjectById(id)
+                .orElseThrow( () -> new ProjectNotFoundException(
+                        String.format("A project with the Id '%d' doesn't exist", id))
+                );
 
         this.projectRepository.deleteById(id);
     }
