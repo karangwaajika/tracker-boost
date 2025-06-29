@@ -2,6 +2,7 @@ package com.lab.trackerboost.controller;
 
 import com.lab.trackerboost.dto.task.TaskDto;
 import com.lab.trackerboost.dto.task.TaskResponseDto;
+import com.lab.trackerboost.exception.TaskNotFoundException;
 import com.lab.trackerboost.mapper.manual.TaskMapper;
 import com.lab.trackerboost.model.TaskEntity;
 import com.lab.trackerboost.service.TaskService;

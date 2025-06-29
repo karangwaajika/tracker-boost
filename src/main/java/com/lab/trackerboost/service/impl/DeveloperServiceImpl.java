@@ -3,6 +3,8 @@ package com.lab.trackerboost.service.impl;
 import com.lab.trackerboost.dto.authentication.UserRegisterDto;
 import com.lab.trackerboost.dto.developer.DeveloperDto;
 import com.lab.trackerboost.dto.developer.DeveloperResponseDto;
+import com.lab.trackerboost.exception.UserExistsException;
+import com.lab.trackerboost.exception.UserNotFoundException;
 import com.lab.trackerboost.mapper.manual.DeveloperMapper;
 import com.lab.trackerboost.model.DeveloperEntity;
 import com.lab.trackerboost.model.SkillEntity;
