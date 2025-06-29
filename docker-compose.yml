@@ -24,7 +24,7 @@ services:
   mongodb:
     image: mongo:7.0
     ports:
-      - "27117:27117"
+      - "27017:27017"
     volumes:
       - mongodata:/data/db
     restart: unless-stopped

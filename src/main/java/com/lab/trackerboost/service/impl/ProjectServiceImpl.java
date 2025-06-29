@@ -51,15 +51,17 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         ProjectEntity project = this.modelMapper
-                                    .map(projectRepository, ProjectEntity.class);
+                                    .map(dto, ProjectEntity.class);
+        ProjectEntity savedProject = this.projectRepository.save(project);
+
         // insert log action for create project
         this.auditLogService.logAction(
-                "CREATE", "Project", project.getId().toString(), "user",
-                Map.of("name", project.getName(), "description", project.getDescription())
+                "CREATE", "Project", savedProject.getId().toString(), "user",
+                Map.of("name", savedProject.getName(), "description", savedProject.getDescription())
         );
 
         return this.modelMapper
-                .map(this.projectRepository.save(project), ProjectResponseDto.class);
+                .map(savedProject, ProjectResponseDto.class);
     }
 
     @Override

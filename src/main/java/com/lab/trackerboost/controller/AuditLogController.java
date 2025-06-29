@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/logs")
+@RequestMapping("/api/logs")
 @Tag(name = "AuditLog Controller", description = "Manage all the Developer's urls")
 public class AuditLogController {
     private final AuditLogService auditLogService;
@@ -23,7 +23,7 @@ public class AuditLogController {
         this.auditLogService = auditLogService;
     }
 
-    @GetMapping
+    @GetMapping("/view")
     @Operation(summary = "View AuditLog")
     public ResponseEntity<List<AuditLogEntity>> getLogs(
             @RequestParam Optional<String> entityType,

@@ -33,7 +33,7 @@ public class TaskEntity {
     private LocalDate dueDate;
 
     @ManyToOne(optional = false) // not null
-    @JoinColumn(name = "project_id", nullable = false, unique = true)
+    @JoinColumn(name = "project_id", nullable = false)
     private ProjectEntity project;
 
     @ManyToOne(optional = true) // by default true
