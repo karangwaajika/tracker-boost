@@ -1,9 +1,11 @@
 package com.lab.trackerboost.service.impl;
 
 import com.lab.trackerboost.dto.project.ProjectRequestDto;
+import com.lab.trackerboost.dto.project.ProjectResponseDto;
 import com.lab.trackerboost.model.ProjectEntity;
 import com.lab.trackerboost.repository.ProjectRepository;
 import com.lab.trackerboost.service.ProjectService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,24 +19,21 @@ import java.util.Optional;
 @Service
 public class ProjectServiceImpl implements ProjectService {
     ProjectRepository projectRepository;
+    ModelMapper modelMapper;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository){
+    public ProjectServiceImpl(ProjectRepository projectRepository,
+                              ModelMapper modelMapper){
 
         this.projectRepository = projectRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public ProjectEntity create(ProjectRequestDto dto) {
-        ProjectEntity project = new ProjectEntity();
-
-        project.setName(dto.getName());
-        project.setDescription(dto.getDescription());
-        project.setDeadline(dto.getDeadline());
-        project.setStatus(dto.getStatus());
-        project.setCreatedAt(LocalDateTime.now());
-        project.setTaskEntities(new ArrayList<>()); // not set
-
-        return this.projectRepository.save(project);
+    public ProjectResponseDto create(ProjectRequestDto dto) {
+        ProjectEntity project = this.modelMapper
+                                    .map(projectRepository, ProjectEntity.class);
+        return this.modelMapper
+                .map(this.projectRepository.save(project), ProjectResponseDto.class);
     }
 
     @Override
@@ -43,12 +42,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Page<ProjectEntity> findAll(Pageable pageable) {
-        return this.projectRepository.findAll(pageable);
+    public Page<ProjectResponseDto> findAll(Pageable pageable) {
+        Page<ProjectEntity> projectEntityList = this.projectRepository.findAll(pageable);
+        return projectEntityList
+                .map(project->this.modelMapper
+                .map(project, ProjectResponseDto.class));
     }
 
     @Override
-    public ProjectEntity partialUpdate(ProjectEntity projectDto, Long id) {
+    public ProjectResponseDto partialUpdate(ProjectRequestDto projectDto, Long id) {
         ProjectEntity project = findProjectById(id)
                 .orElseThrow();
         // update only fields that are provided
@@ -65,7 +67,8 @@ public class ProjectServiceImpl implements ProjectService {
             project.setStatus(projectDto.getStatus());
         }
 
-        return this.projectRepository.save(project);
+        return this.modelMapper
+                .map(this.projectRepository.save(project), ProjectResponseDto.class);
     }
 
     @Override
@@ -77,13 +80,22 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectEntity> findAllProject() {
-        return this.projectRepository.findAll();
+    public List<ProjectResponseDto> findAllProject() {
+        List<ProjectEntity> projectEntityList = this.projectRepository.findAll();
+        return projectEntityList.stream()
+                .map(project->this.modelMapper.map(project,
+                        ProjectResponseDto.class))
+                .toList();
     }
 
     @Override
-    public List<ProjectEntity> findProjectsWithoutTasks() {
-        return this.projectRepository.findProjectsWithoutTasks();
+    public List<ProjectResponseDto> findProjectsWithoutTasks() {
+        List<ProjectEntity> projectEntityList = this.projectRepository.findProjectsWithoutTasks();
+        return projectEntityList
+                .stream()
+                .map(project->this.modelMapper
+                        .map(project, ProjectResponseDto.class))
+                .toList();
     }
 
     @Override

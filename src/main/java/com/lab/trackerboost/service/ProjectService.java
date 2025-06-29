@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProjectService {
-    ProjectRequestDto create(ProjectRequestDto project);
+    ProjectResponseDto create(ProjectRequestDto project);
     Optional<ProjectEntity> findProjectById(Long id);
     Optional<ProjectEntity> findProjectByName(String name);
     Page<ProjectResponseDto> findAll(Pageable pageable);
-    ProjectRequestDto partialUpdate(ProjectRequestDto project, Long id);
+    ProjectResponseDto partialUpdate(ProjectRequestDto project, Long id);
     void deleteById(Long id);
     List<ProjectResponseDto> findAllProject();
     List<ProjectResponseDto> findProjectsWithoutTasks();
